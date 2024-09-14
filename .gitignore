@@ -165,3 +165,5 @@ cython_debug/
 audio_output/
 
 # Prompt files
+src/prompts/
+prompts/
