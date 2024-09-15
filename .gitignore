@@ -163,7 +163,11 @@ cython_debug/
 
 # Audio output files
 audio_output/
+temp_audio/
 
 # Prompt files
 src/prompts/
 prompts/
+
+# temp audio files
+audio_new.m4a

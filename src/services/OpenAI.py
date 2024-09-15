@@ -85,4 +85,11 @@ class OpenAIService:
     def generate_review_response(self, conversation, model, prompt):
         return conversation
     
+    def speech_to_text(self, path):
+        response = self.client.audio.transcriptions.create(
+            model="whisper-1",
+            file=open(path, "rb"),
+        )
+        return response.text
+    
     
