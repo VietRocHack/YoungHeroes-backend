@@ -2,9 +2,7 @@ from pathlib import Path
 from openai import OpenAI
 import uuid
 import json
-
-# Create a UUID for the speech file. If there is not path, create one
-speech_file_path = Path(__file__).parent.parent.parent / f"audio_output\openai\{uuid.uuid4()}.mp3"
+import os
 
 class OpenAIService:
     # client: OpenAI client
@@ -16,6 +14,14 @@ class OpenAIService:
 
     # Generate speech from text, save to file
     def generate_speech(self, text, voice, model):
+        # Create a unique path for each speech file
+        audio_output_dir = Path(__file__).parent.parent.parent / "audio_output" / "openai"
+        # Create directory if it doesn't exist
+        audio_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create unique filename
+        speech_file_path = audio_output_dir / f"{uuid.uuid4()}.mp3"
+        
         response = self.client.audio.speech.create(
             model=model,
             voice=voice,

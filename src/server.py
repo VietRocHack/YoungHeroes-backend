@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 
 import json
 
-load_dotenv()
+# Load .env file from the src directory
+load_dotenv(Path(__file__).parent / '.env')
 
 app = Flask(__name__)
 CORS(app)
@@ -48,10 +49,31 @@ def tts():
     text = request.args.get('text')
     id = request.args.get('callId')
     if text and id:
-        id, text_message = openai.generate_dispatcher_response(text, assistant_id=ASSISTANT_ID, thread_id=id)
-        text_tts_path = openai.generate_speech(json.loads(text_message)["message"], VOICE, MODEL)
-        print(text_tts_path)
-        return send_file(Path(str(text_tts_path).replace("..\\\\", "", 1))), HTTP_OK
+        try:
+            id, text_message = openai.generate_dispatcher_response(text, assistant_id=ASSISTANT_ID, thread_id=id)
+            
+            # Parse JSON response and extract message
+            try:
+                message_data = json.loads(text_message)
+                message_text = message_data.get("message", text_message)
+            except (json.JSONDecodeError, KeyError, TypeError):
+                # If not JSON or missing "message" key, use the text_message directly
+                message_text = text_message
+            
+            # Generate speech
+            text_tts_path = openai.generate_speech(message_text, VOICE, MODEL)
+            print(f"Generated audio file: {text_tts_path}")
+            
+            # Check if file exists before sending
+            if not text_tts_path.exists():
+                return jsonify({"error": "Audio file was not created"}), 500
+            
+            return send_file(str(text_tts_path)), HTTP_OK
+        except Exception as e:
+            print(f"Error in /api/tts: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
     elif not text:
         return 'text parameter is missing.', HTTP_BAD_REQUEST
     else:

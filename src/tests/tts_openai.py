@@ -14,7 +14,7 @@ speech_file_path = Path("audio_output/openai/speech.wav")
 response = client.audio.speech.create(
   model="tts-1",
   voice="onyx",
-  input="Địt mẹ thằng hoàng ngu vl"
+  input="Blah blah blah"
 )
 
 response.stream_to_file(speech_file_path)
